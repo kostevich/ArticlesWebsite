@@ -2,6 +2,10 @@
 from flask import Flask
 # Импортируем модуль render_template для работы шаблонов.
 from flask import render_template
+# Импортируем модуль request получения запросов.
+from flask import request
+# Импортируем модуль redirect для перенаправления на другую страницу.
+from flask import redirect
 # Импортируем модуль SQLAlchemy для работы с базой данных.
 from flask_sqlalchemy import SQLAlchemy
 # Импортируем модуль datetime для работы с полем дата базы данных.
@@ -10,12 +14,12 @@ from datetime import datetime
 # Создаем основной объект app класса Flask.
 app = Flask(__name__)
 # Настройки бд c названием sqlite:///blog.bd.
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.bd'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 # Создание бд.
 db = SQLAlchemy(app)
 
 
-# Создадим класс, на основе которого, будет создаваться таблица
+# Создадим класс, на основе которого, будет создаваться таблица.
 class Article(db.Model):
     # Добавим поле id, уникальное.
     id = db.Column(db.Integer, primary_key=True)
@@ -32,20 +36,20 @@ class Article(db.Model):
     # Добавим поле время изменения, значение по умолчанию время сейчас, и оно обновляется при обновлении информации в базе данных.
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Получение данных объетка базы данных в виде строки.
+    # Получение данных объекта базы данных в виде строки.
     def __repr__(self):
         return '<Article %r>' % self.id
 
 
-# /Декоратор, который регистрирует URL-адрес, # в котором будет осуществляться представление.
+# Декоратор, который регистрирует URL-адрес.
 @app.route('/')
-@app.route('/home')
 # Функция для вывода информации по ссылке.
 def index():
     # Возвращаем на страницу текст.
     return render_template("index.html")
 
 
+# Декоратор, который регистрирует URL-адрес.
 @app.route('/about')
 # Функция для вывода информации по ссылке.
 def about():
@@ -53,12 +57,48 @@ def about():
     return render_template("about.html")
 
 
-# Декоратор, который регистрирует URL-адрес, в котором будет осуществляться представление.
-@app.route('/create_articles')
+# Декоратор, который регистрирует URL-адрес.
+@app.route('/watch_articles')
+# Функция для вывода всех статей.
+def watch_articles():
+    # Создаем объект, в котором находится данные всех полей класса Article
+    article = Article.query.order_by(Article.create_on).all()
+    # Возвращаем статьи на страницу.
+    return render_template("watch_articles.html", article=article)
+
+
+# Декоратор, который регистрирует URL-адрес, и отслеживающий методы POST и GET.
+@app.route('/create_articles', methods=['POST', 'GET'])
 # Функция для вывода информации по ссылке.
-def creation_articles():
-    # Возвращаем на страницу текст.
-    return render_template("create_articles.html")
+def create_articles():
+    # Если запрос с методом POST.
+    if request.method == 'POST':
+        # Сохраняем в переменную text значение из поля формы text.
+        tag = request.form['tag']
+        # Сохраняем в переменную title значение из поля формы title.
+        title = request.form['title']
+        # Сохраняем в переменную intro значение из поля формы intro.
+        intro = request.form['intro']
+        # Сохраняем в переменную text значение из поля формы text.
+        text = request.form['text']
+        # Сохраняем объект класса Article с данными из переменных, записанных в нужные поля)
+        article = Article(title=title, tag=tag, intro=intro, text=text)
+        # Попробуем добавить значения в базу данных.
+        try:
+            # Добавление объекта класса Article в сессию.
+            db.session.add(article)
+            # Сохранение в базе данных.
+            db.session.commit()
+            # Возвращение на главную страницу.
+            return redirect('/')
+        # Исключение.
+        except:
+            # Возвращаем ошибку: Возвращаемся на страницу.
+            return "Не удалось добавить статью."
+    # Если запрос с методом POST.
+    else:
+        # Возвращаемся на страницу.
+        return render_template("create_articles.html")
 
 
 # Проверка правильности запуска проекта через файл с названием app.
