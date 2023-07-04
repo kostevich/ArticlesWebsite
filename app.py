@@ -61,8 +61,37 @@ def about():
 @app.route('/watch_articles')
 # Функция для вывода всех статей.
 def watch_articles():
-    # Создаем объект, в котором находится данные всех полей класса Article
-    article = Article.query.order_by(Article.create_on).all()
+    # Создаем объект, в котором находится данные всех полей класса Article.
+    articles = Article.query.order_by(Article.create_on.desc()).all()
+    # Возвращаем статьи на страницу.
+    return render_template("watch_articles.html", articles=articles)
+
+
+@app.route('/watch_articles/<int:id>')
+# Функция для детального просмотра статьи.
+def watch_detailarticles(id):
+    # Сохраняем объект, в котором находится данные выбранной статьи.
+    article = Article.query.get(id)
+    # Возвращаем подробную статью на страницу.
+    return render_template("watch_detailarticles.html", article=article)
+
+
+@app.route('/watch_articles/<int:id>/delete')
+# Функция для вывода всех статей.
+def delete_detailarticles(id):
+    # Ищем объект, который надо удалить или 404.
+    article = Article.query.get_or_404(id)
+    try:
+        # Удаление объекта класса Article и добавление в сессию.
+        db.session.delete(article)
+        # Удаление статьи в базе данных.
+        db.session.commit()
+        # Возвращение на страницу со всеми статьями.
+        return redirect('/watch_articles')
+    # Исключение.
+    except:
+        # Возвращаем ошибку: "Не удалось удалить статью".
+        return "Не удалось удалить статью."
     # Возвращаем статьи на страницу.
     return render_template("watch_articles.html", article=article)
 
@@ -89,11 +118,11 @@ def create_articles():
             db.session.add(article)
             # Сохранение в базе данных.
             db.session.commit()
-            # Возвращение на главную страницу.
-            return redirect('/')
+            # Возвращение на страницу со всеми статьями.
+            return redirect('/watch_articles')
         # Исключение.
         except:
-            # Возвращаем ошибку: Возвращаемся на страницу.
+            # Возвращаем ошибку: "Не удалось добавить статью".
             return "Не удалось добавить статью."
     # Если запрос с методом POST.
     else:
