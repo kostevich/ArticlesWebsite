@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Мои статьи
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <center><h1 class="display-3">Мои статьи</h1></center>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ article.title }}</h2><br>
+            <h6 class="card-subtitle mb-2 text-muted">{{ article.intro }}</h6>
+            <p class="card-text">{{ article.text }}</p>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm">Дата создания: {{ article.create_on.date() }}</div>
+                    <div class="col-sm">Дата изменения: {{ article.updated_on.date() }}</div>
+                </div>
+                <div class="nav-link disabled text-primary"># {{ article.tag }}</div>
+                <a href="{{ article.id }}/delete" class="btn btn-danger">Удаление статьи</a>
+                <a href="{{ article.id }}/edit" class="btn btn-warning">Редактирование статьи</a>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</div>
+{% endblock %}
