@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Мои статьи
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <center><h1 class="display-3">Мои статьи</h1></center>
+    </div>
+    {% for el in articles %}
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ el.title }}</h2><br>
+            <h6 class="card-subtitle mb-2 text-muted">{{ el.intro }}</h6>
+            <a href="watch_articles/{{ el.id }}" class="btn btn-link">Детальнее</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    {% endfor %}
+</div>
+{% endblock %}
