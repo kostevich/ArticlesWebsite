@@ -9,6 +9,7 @@
     <div class="jumbotron jumbotron-fluid">
         <center><h1 class="display-3">Мои статьи</h1></center>
     </div>
+    {% if articles| length>0 %}
     {% for el in articles %}
     <div class="card">
         <div class="card-body">
@@ -20,5 +21,8 @@
     <br>
     <br>
     {% endfor %}
+    {% else %}
+    <p>На сайте отсутcтвуют статьи</p>
+    {% endif %}
 </div>
 {% endblock %}
