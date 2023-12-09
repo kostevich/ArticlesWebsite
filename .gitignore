@@ -1,2 +1,7 @@
+# Program files
+migrations
+__pycache__
 
+
+# Confidential files
 instance/blog.db
